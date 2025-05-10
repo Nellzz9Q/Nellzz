@@ -1,6 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
-import { Noto_Sans_JP, Poppins, MuseoModerno } from "next/font/google";
+import { Noto_Sans_JP, Poppins } from "next/font/google";
 import type { Metadata } from "next";
 import Header from "./components/Header";
 

@@ -22,7 +22,7 @@ export function remarkSubTitle() {
                 type: 'text',
                 value: part,
               };
-            }
+            } //generateStaticParams
           });
         }
         return [node];

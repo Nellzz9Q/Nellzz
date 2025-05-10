@@ -22,7 +22,7 @@ export async function generateStaticParams() {
   const posts = getSortedPostsData();
   return posts.map((post) => ({
     id: post.id, // ← post.id が 'first-post' のようなスラッグになっていること！
-  }));
+  })); //generateStaticParams
 }
 
 export default async function Post({ params }: Props) {
