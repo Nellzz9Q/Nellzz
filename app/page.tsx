@@ -38,9 +38,9 @@ export default function Home() {
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
     {allPostsData.map((post) => (
       <div key={post.id} className="rounded overflow-hidden shadow-lg bg-white">
-        {post.thumbnail && (
+        {post.thumbnail && ( //thumbnailがエラー
           <Image
-            src={post.thumbnail}
+            src={post.thumbnail} //thumbnailがエラー
             alt={`${post.title} のサムネイル`}
             width={800}
             height={400}
