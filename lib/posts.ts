@@ -67,7 +67,7 @@ export async function getPostData(id: string) {
     const contentHtml = rehypeContent.toString();
 
     return {
-      id,
+      id, //mb
       contentHtml,
       ...(matterResult.data as { date: string; title: string; thumbnail?: string }),
     };

@@ -5,7 +5,7 @@ export default async function BlogPage() {
   const allPostsData = await getSortedPostsData(); // ← await を追加
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-white text-black p-8">
       <h1 className="text-3xl font-bold text-accent mb-6">Blog</h1>
       <ul className="space-y-4">
         {allPostsData.map(({ id, date, title }) => (
