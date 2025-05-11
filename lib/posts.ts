@@ -8,6 +8,7 @@ import breaks from 'remark-breaks';
 import { remarkSubTitle } from '@/lib/remarkPlugins';
 import { rehype } from 'rehype';
 import rehypeClassNames from 'rehype-class-names';
+import gfm from 'remark-gfm'; // ← 追加
 
 const postsDirectory = path.join(process.cwd(), 'posts');
 
@@ -56,9 +57,9 @@ export async function getPostData(id: string) {
     const processedContent = await remark()
       .use(remarkSubTitle)
       .use(breaks)
+      .use(gfm)
       .use(html)
       .process(matterResult.content);
-
     const rehypeContent = await rehype()
       .use(rehypeClassNames, { h3: 'text-2xl font-bold' })
       .process(processedContent.toString());

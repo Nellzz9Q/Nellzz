@@ -45,7 +45,7 @@ export default async function Post({ params }: PageProps) {
       <div className="text-gray-500 mb-4">
         {new Date(post.date).toLocaleDateString()}
       </div>
-      <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
+      <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} className='mb-4' />
     </div>
   );
 }
