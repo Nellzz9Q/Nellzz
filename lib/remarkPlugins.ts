@@ -2,7 +2,7 @@ import { visit } from 'unist-util-visit';
 
 export function remarkSubTitle() {
   return (tree: any) => {
-    visit(tree, 'paragraph', (node: any, index: number, parent: any) => {
+    visit(tree, 'paragraph', (node: any, index: number, parent: any) => { //visitがエラーだけどこれ関係ない？
       if (!node.children) return;
 
       // 子ノードの中に &&text&& を含むテキストがあるか確認

@@ -1,10 +1,8 @@
-// app/blog/page.tsx
-
 import { getSortedPostsData } from '@/lib/posts';
 import Link from 'next/link';
 
 export default async function BlogPage() {
-  const allPostsData = getSortedPostsData(); // SSG的な使い方OK
+  const allPostsData = await getSortedPostsData(); // ← await を追加
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
@@ -16,12 +14,11 @@ export default async function BlogPage() {
               {title}
             </Link>
             <div className="text-sm text-gray-400">
-  {new Date(date).toLocaleDateString()}
-</div>
-
+              {new Date(date).toLocaleDateString()}
+            </div>
           </li>
         ))}
       </ul>
     </div>
   );
-} //slug
+}

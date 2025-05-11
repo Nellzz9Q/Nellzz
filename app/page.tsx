@@ -2,8 +2,8 @@ import { getSortedPostsData } from '@/lib/posts';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Home() {
-  const allPostsData = getSortedPostsData(); // SSG的な使い方OK
+export default async function Home() {
+  const allPostsData = await getSortedPostsData(); // SSG的な使い方OK
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-black p-8">
       {/* アイコン */}

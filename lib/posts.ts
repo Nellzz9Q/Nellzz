@@ -1,66 +1,77 @@
-import fs from 'fs';
+// posts.ts
+import fs from 'fs/promises'; // ←同期から非同期へ！
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
-import breaks from 'remark-breaks'; // 改行処理
-import { remarkSubTitle } from '@/lib/remarkPlugins'; // 自作プラグイン
-import { rehype } from 'rehype'; // 変更点
+import breaks from 'remark-breaks';
+import { remarkSubTitle } from '@/lib/remarkPlugins';
+import { rehype } from 'rehype';
 import rehypeClassNames from 'rehype-class-names';
 
 const postsDirectory = path.join(process.cwd(), 'posts');
 
-export function getSortedPostsData() {
-  const fileNames = fs.readdirSync(postsDirectory);
-  const allPostsData = fileNames.map((fileName) => {
-    const id = fileName.replace(/\.md$/, '');
-    const fullPath = path.join(postsDirectory, fileName);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
+// ✅ 非同期に修正
+export async function getSortedPostsData() {
+  const fileNames = await fs.readdir(postsDirectory);
 
-    const matterResult = matter(fileContents);
+  const allPostsData = await Promise.all(
+    fileNames.map(async (fileName) => {
+      const id = fileName.replace(/\.md$/, '');
+      const fullPath = path.join(postsDirectory, fileName);
+      const fileContents = await fs.readFile(fullPath, 'utf8');
 
-    return {
-      id,
-      ...(matterResult.data as { date: string; title: string; thumbnail?: string }), // ←ここ
-    };
-  });
+      const matterResult = matter(fileContents);
+
+      return {
+        id,
+        ...(matterResult.data as { date: string; title: string; thumbnail?: string }),
+      };
+    })
+  );
 
   return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export function getAllPostSlugs() {
-  const fileNames = fs.readdirSync(postsDirectory);
+// ✅ これも非同期に
+export async function getAllPostSlugs() {
+  const fileNames = await fs.readdir(postsDirectory);
 
   return fileNames.map((fileName) => ({
-    params: {
-      id: fileName.replace(/\.md$/, ''),
-    },
+    id: fileName.replace(/\.md$/, ''),
   }));
 }
 
+// ✅ ここも非同期に
 export async function getPostData(id: string) {
-  const fullPath = path.join(postsDirectory, `${id}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
+  // 拡張子を二重に追加しないように、idに`.md`が含まれている場合は追加しない
+  const fileName = id.endsWith('.md') ? id : `${id}.md`;
+  const fullPath = path.join(postsDirectory, fileName);
+  
+  try {
+    const fileContents = await fs.readFile(fullPath, 'utf8');
+    const matterResult = matter(fileContents);
 
-  const matterResult = matter(fileContents);
+    // 他の処理...
+    const processedContent = await remark()
+      .use(remarkSubTitle)
+      .use(breaks)
+      .use(html)
+      .process(matterResult.content);
 
-  // remark でマークダウンを処理
-  const processedContent = await remark()
-    .use(remarkSubTitle) // 自作プラグイン
-    .use(breaks) // 改行処理
-    .use(html) // HTMLに変換
-    .process(matterResult.content); // マークダウンからHTMLに変換
+    const rehypeContent = await rehype()
+      .use(rehypeClassNames, { h3: 'text-2xl font-bold' })
+      .process(processedContent.toString());
 
-  // rehype でクラス名追加などの最終的な加工
-  const rehypeContent = await rehype()
-    .use(rehypeClassNames, { h3: 'text-2xl font-bold' }) // h3タグにクラス追加
-    .process(processedContent.toString()); // processedContentを渡して最終処理
+    const contentHtml = rehypeContent.toString();
 
-  const contentHtml = rehypeContent.toString(); // 最終的なHTML
-
-  return {
-    id,
-    contentHtml,
-    ...(matterResult.data as { date: string; title: string }),
-  };
+    return {
+      id,
+      contentHtml,
+      ...(matterResult.data as { date: string; title: string; thumbnail?: string }),
+    };
+  } catch (error) {
+    console.error(`Error reading file at path: ${fullPath}`, error);
+    throw error; // ファイルが見つからない場合など、エラー処理を加える
+  }
 }
