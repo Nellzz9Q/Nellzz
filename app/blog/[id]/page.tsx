@@ -1,39 +1,32 @@
-// app/blog/[id]/page.tsx
-
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
 
-type PageProps = {
+type Props = {
   params: {
     id: string;
   };
 };
 
-// 動的なメタデータ生成
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const post = await getPostData(params.id);
-  if (!post) return { title: '記事が見つかりません' };
-  return {
-    title: post.title,
-  };
-}
-
-// 静的に生成するパス一覧
+// ✅ 動的パラメータを生成するApp Routerの方法
 export async function generateStaticParams() {
   const posts = await getSortedPostsData();
-  return posts.map((post) => ({
-    id: post.id,
-  }));
+  return posts.map((post) => ({ id: post.id }));
 }
 
-// 実際のページ本体
-export default async function Post({ params }: PageProps) {
+// ✅ メタデータ生成
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = await getPostData(params.id);
+  return { title: post.title };
+}
+
+// ✅ 実際のページ本体
+export default async function Post({ params }: Props) {
   const post = await getPostData(params.id);
   if (!post) return notFound();
 
   return (
-    <div className="prose prose-lg dark:prose-invert max-w-none mx-auto p-8">
+<div className="prose prose-lg dark:prose-invert max-w-none mx-auto p-8">
       {post.thumbnail && (
         <img
           src={post.thumbnail}
@@ -42,10 +35,7 @@ export default async function Post({ params }: PageProps) {
         />
       )}
       <h1 className="text-3xl font-bold">{post.title}</h1>
-      <div className="text-gray-500 mb-4">
-        {new Date(post.date).toLocaleDateString()}
-      </div>
-      <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} className='mb-4' />
+      <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
     </div>
   );
 }
