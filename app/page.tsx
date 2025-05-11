@@ -15,7 +15,7 @@ export default async function Home() {
         />
       </div>
       <h1 className="text-5xl font-bold mb-2">Nellzz</h1>
-      <p className='text-1xl mb-2'>日本の常に眠気がMaxの学生開発者</p>
+      <p className='text-1xl mb-2'>常に眠気がMaxの日本の学生開発者</p>
       <p className="text-gray-500">Web Developer & Designer</p>
       <div className="mb-4 flex">
         <a href="https://github.com/nellzz9Q" target="_blank">

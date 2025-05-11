@@ -1,4 +1,5 @@
 // app/blog/[id]/page.tsx
+
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
@@ -9,25 +10,23 @@ type Props = {
   };
 };
 
-// params.idの非同期解決
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPostData(params.id); // 非同期でデータを取得
-  return {
-    title: post.title,
-  };
-}
-
-// generateStaticParams は修正しなくて大丈夫
+// 動的ルート用（SSG）
 export async function generateStaticParams() {
   const posts = await getSortedPostsData();
   return posts.map((post) => ({ id: post.id }));
 }
 
+// SEO対応
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = await getPostData(params.id);
+  return {
+    title: post?.title || '記事が見つかりません',
+  };
+}
+
 export default async function Post({ params }: Props) {
-  // params.idの非同期解決
   const post = await getPostData(params.id);
 
-  // slugが見つからなければ404ページを表示
   if (!post) return notFound();
 
   return (
