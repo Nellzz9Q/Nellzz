@@ -5,27 +5,31 @@ import { Metadata } from 'next';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
 
 type PageProps = {
-  params: { id: string };
+  params: {
+    id: string;
+  };
 };
 
-
-// 動的ルート用（SSG）
-export async function generateStaticParams() {
-  const posts = await getSortedPostsData();
-  return posts.map((post) => ({ id: post.id }));
-}
-
-// SEO対応
+// 動的なメタデータ生成
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const post = await getPostData(params.id);
+  if (!post) return { title: '記事が見つかりません' };
   return {
-    title: post?.title || '記事が見つかりません',
+    title: post.title,
   };
 }
 
+// 静的に生成するパス一覧
+export async function generateStaticParams() {
+  const posts = await getSortedPostsData();
+  return posts.map((post) => ({
+    id: post.id,
+  }));
+}
+
+// 実際のページ本体
 export default async function Post({ params }: PageProps) {
   const post = await getPostData(params.id);
-
   if (!post) return notFound();
 
   return (
