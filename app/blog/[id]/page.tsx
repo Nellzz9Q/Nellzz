@@ -4,11 +4,10 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getPostData, getSortedPostsData } from '@/lib/posts';
 
-type Props = {
-  params: {
-    id: string;
-  };
+type PageProps = {
+  params: { id: string };
 };
+
 
 // 動的ルート用（SSG）
 export async function generateStaticParams() {
@@ -17,14 +16,14 @@ export async function generateStaticParams() {
 }
 
 // SEO対応
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const post = await getPostData(params.id);
   return {
     title: post?.title || '記事が見つかりません',
   };
 }
 
-export default async function Post({ params }: Props) {
+export default async function Post({ params }: PageProps) {
   const post = await getPostData(params.id);
 
   if (!post) return notFound();
